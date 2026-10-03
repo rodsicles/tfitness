@@ -74,3 +74,5 @@ Tables now offer direct Download PDF, using all filtered and sorted records acro
 Transactions export includes period totals and, for Annual Transactions, a complete January–December breakdown. Reports has Download complete PDF covering the summary, revenue, attendance, walk-ins, renewals and most frequent members. Receipts download as portrait PDFs; voided receipts show their status and reason. CSV and Excel-compatible exports remain available.
 
 `npm run test:pdf` verifies multipage content, totals, final rows, page width bounds, empty states, and receipts. Browser tests also download receipt, report and transaction PDFs using isolated test records.
+
+PDF actions use **Export PDF** and download a `.pdf` directly without a print dialog. Filenames include the configured gym name, data type, and selected period (or the current Philippine date for record snapshots), for example `MUSCLE-T-FITNESS-GYM_Walk-ins_2026-10-03.pdf`. Receipts use their payment date; transaction and report exports use the selected period.

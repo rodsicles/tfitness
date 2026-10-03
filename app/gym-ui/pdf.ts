@@ -2,14 +2,20 @@
 import {isValidElement,type ReactNode} from 'react';
 import type {Column} from './table';
 import type {Row} from '@/lib/gym/model';
-export type PdfMeta={gymName:string;address?:string;contact?:string;email?:string;preparedBy?:string};
+export type PdfMeta={gymName:string;address?:string;contact?:string;email?:string;preparedBy?:string;reportPeriod?:string};
 export type PdfSection={title:string;rows:Row[];columns:Column[]};
-export type PdfOptions={title:string;filename?:string;period?:string;note?:string;meta:PdfMeta;sections:PdfSection[];totals?:{label:string,value:string|number}[];orientation?:'portrait'|'landscape'};
+export type PdfOptions={title:string;filename?:string;filePeriod?:string;period?:string;note?:string;meta:PdfMeta;sections:PdfSection[];totals?:{label:string,value:string|number}[];orientation?:'portrait'|'landscape'};
 export function exportText(value:any):string{if(value===null||value===undefined)return '';if(typeof value==='string'||typeof value==='number'||typeof value==='boolean')return String(value);if(Array.isArray(value))return value.map(exportText).join(' ');if(isValidElement(value))return exportText((value.props as {children?:ReactNode}).children);return JSON.stringify(value)}
 export const cellText=(r:Row,c:Column)=>c.exportValue?exportText(c.exportValue(r)):c.render?exportText(c.render(r)):exportText(r[c.key]);
 // Built-in PDF fonts use PHP to render Philippine currency consistently.
 const clean=(v:any)=>exportText(v).replaceAll('₱','PHP ').replace(/[–—]/g,'-').replace(/[·•]/g,' | ');
 export function pdfFilename(name:string){return (name.replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,140)||'gym-report')+'.pdf'}
+// Every download names the gym, selected dataset, and reporting period (or snapshot date).
+export function reportFilename(options:PdfOptions, now=new Date()){
+ const date=now.toLocaleDateString('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'});
+ const segment=(v:string,max:number)=>v.replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,max);
+ return [segment(options.meta.gymName||'Gym',50),segment(options.filename||options.title,65),segment(options.filePeriod||options.meta.reportPeriod||date,40)].filter(Boolean).join('_')+'.pdf';
+}
 export async function createPdf(options:PdfOptions){
  const [{jsPDF},{default:autoTable}]=await Promise.all([import('jspdf'),import('jspdf-autotable')]);
  const maxCols=Math.max(0,...options.sections.map(s=>s.columns.length));
@@ -28,6 +34,6 @@ export async function createPdf(options:PdfOptions){
  const pages=doc.getNumberOfPages();for(let i=1;i<=pages;i++){doc.setPage(i);doc.setDrawColor(190);doc.line(margin,height-18,width-margin,height-18);doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(105);doc.text(clean(`Generated ${generated} PHT${options.meta.preparedBy?' | '+options.meta.preparedBy:''}`).slice(0,140),margin,height-12);doc.text(`Page ${i} of ${pages}`,width-margin,height-12,{align:'right'});}
  return doc;
 }
-export async function downloadPdf(options:PdfOptions){const doc=await createPdf(options);doc.save(pdfFilename(options.filename||options.title));}
+export async function downloadPdf(options:PdfOptions){const doc=await createPdf(options);const url=URL.createObjectURL(doc.output('blob'));const link=document.createElement('a');link.href=url;link.download=reportFilename(options);document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
 
 
