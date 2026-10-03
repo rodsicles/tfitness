@@ -66,3 +66,11 @@ Import this GitHub repository into Vercel and select Next.js. Use the standard b
 - `APP_ORIGIN=https://your-exact-production-domain.vercel.app` (no trailing slash)
 
 Redeploy after changing environment variables. Keep secrets out of Git and browser-exposed variables. Initialize the production database by running `npm run setup:admin` from a trusted local shell with those same destination variables configured. This creates an admin only for a fresh database. Existing local records are not migrated automatically. Live Upstash and Vercel deployment have not been verified.
+
+## PDF exports
+
+Tables now offer direct Download PDF, using all filtered and sorted records across pagination. PDFs use an A4 layout with gym contact details, report title/period, readable wrapped tables, repeated column headers, generated date, staff name and page numbers. Wide tables automatically use landscape pages. Currency is rendered as PHP for reliable PDF font support.
+
+Transactions export includes period totals and, for Annual Transactions, a complete January–December breakdown. Reports has Download complete PDF covering the summary, revenue, attendance, walk-ins, renewals and most frequent members. Receipts download as portrait PDFs; voided receipts show their status and reason. CSV and Excel-compatible exports remain available.
+
+`npm run test:pdf` verifies multipage content, totals, final rows, page width bounds, empty states, and receipts. Browser tests also download receipt, report and transaction PDFs using isolated test records.

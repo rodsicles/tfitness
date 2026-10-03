@@ -143,3 +143,4 @@ body {
 [data-slot=dialog-overlay],[data-slot=alert-dialog-overlay]{animation:none!important;transition:none!important}
 .gym-dialog{background:#fff!important;opacity:1!important}
 .transaction-tabs{margin-bottom:20px;max-width:100%;overflow-x:auto}.transaction-filters{align-items:end}.transaction-filters label{font-size:13px;gap:7px}.transaction-period{font-size:13px;color:#666;margin:0 0 18px}.transaction-note{font-size:13px;line-height:1.6;margin:16px 0}.transaction-filters input{font-size:14px;padding:9px}@media(max-width:640px){.transaction-tabs{width:100%;justify-content:flex-start}.transaction-tabs button{font-size:12px}.transaction-filters label{width:100%}}
+.table-export-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.table-export-actions .primary{padding:9px 13px}.report-actions .primary{padding:9px 13px}@media(max-width:640px){.table-export-actions{width:100%}.table-export-actions button{flex:1}}
