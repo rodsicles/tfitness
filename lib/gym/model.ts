@@ -1,0 +1,9 @@
+﻿export type Row = Record<string, any>;
+export type State = {version:number; counters:Record<string,number>; admins:Row[]; members:Row[]; plans:Row[]; memberships:Row[]; checkins:Row[]; walkins:Row[]; payments:Row[]; notes:Row[]; audits:Row[]; settings:Row};
+export const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+export const daysLeft=(date:string,now=today())=>Math.round((Date.parse(date+'T00:00:00Z')-Date.parse(now+'T00:00:00Z'))/86400000);
+export function memberStatus(m:Row,threshold=7){if(m.archived)return 'Archived';if(m.status==='Inactive')return 'Inactive';if(m.status==='Non-Renewing')return 'Non-Renewing';if(m.start>today()&&!(m.previousPeriods||[]).some((p:Row)=>p.start<=today()&&p.expiry>=today()))return 'Not Started';const d=daysLeft(m.expiry);return d<0?'Expired':d===0?'Expires Today':d<=threshold?'Expiring Soon':'Active'}
+export function endDate(start:string,days:number){const d=new Date(start+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+days-1);return d.toISOString().slice(0,10)}
+export const money=(v:number)=>new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP'}).format(v||0);
+export function emptyState():State{return {version:0,counters:{},admins:[],members:[],plans:[['Daily',1,100],['Weekly',7,350],['Monthly',30,1000],['Quarterly',90,2700],['6 Months',180,5000],['Annual',365,9500]].map(([name,duration,price],i)=>({id:'PLAN-'+(i+1),name,duration,price,description:'',active:true})),memberships:[],checkins:[],walkins:[],payments:[],notes:[],audits:[],settings:{gymName:'MUSCLE T FITNESS GYM',address:'',contact:'',email:'',logo:'',threshold:7,walkinRate:100,currency:'PHP',dateFormat:'YYYY-MM-DD',timeFormat:'12-hour',paymentMethods:['Cash','GCash','Maya','Bank Transfer','Other'],rules:'Memberships include the start date and remain valid through the expiration date. Duplicate check-ins are blocked for 15 minutes.'}}}
+
